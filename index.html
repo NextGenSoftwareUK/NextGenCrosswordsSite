@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NextGen Crosswords — Times · Sunday Times · The Sun</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✏️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Playfair+Display:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06080f;
+  --bg-card:#0b0f1c;
+  --gold:#f0c040;
+  --gold2:#ffd860;
+  --cream:#f5edd8;
+  --navy:#1a2744;
+  --electric:#00c8ff;
+  --green:#00e87c;
+  --violet:#a855f7;
+  --text:#c8bfa8;
+  --heading:#fff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:17px;line-height:1.75;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse 70% 40% at 50% 0%,rgba(240,192,64,.07),transparent 60%),
+             radial-gradient(ellipse 40% 30% at 90% 80%,rgba(0,200,255,.04),transparent 60%);
+  pointer-events:none;z-index:0}
+
+/* ── CROSSWORD GRID BG ── */
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.04;
+  background-image:linear-gradient(var(--gold) 1px,transparent 1px),linear-gradient(90deg,var(--gold) 1px,transparent 1px);
+  background-size:40px 40px}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;background:rgba(6,8,15,.93);backdrop-filter:blur(12px);border-bottom:1px solid rgba(240,192,64,.15)}
+.nav-brand{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;letter-spacing:.04em;color:#fff;text-decoration:none}
+.nav-brand span{color:var(--gold)}
+.nav-links{display:flex;gap:24px;list-style:none}
+.nav-links a{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.14em;color:var(--text);text-decoration:none;transition:color .2s;text-transform:uppercase}
+.nav-links a:hover{color:var(--gold)}
+.nav-links-mobile-only{display:none}
+.nav-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-cta{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold);border:1px solid rgba(240,192,64,.35);border-radius:999px;padding:8px 18px;text-decoration:none;transition:background .2s;white-space:nowrap}
+.nav-cta:hover{background:rgba(240,192,64,.08);border-color:var(--gold2)}
+.nav-toggle{display:none;flex-direction:column;justify-content:center;gap:5px;width:32px;height:32px;background:none;border:none;cursor:pointer;z-index:101}
+.nav-toggle span{display:block;width:100%;height:2px;background:var(--text);transition:transform .25s,opacity .25s}
+.nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-toggle.open span:nth-child(2){opacity:0}
+.nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+@media(max-width:900px){
+  .nav-links{display:none;flex-direction:column;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(6,8,15,.98);padding:100px 40px 40px;gap:28px;z-index:99}
+  .nav-links.open{display:flex}
+  .nav-links-mobile-only{display:list-item}
+  .nav-toggle{display:flex}
+  nav{padding:14px 20px}
+}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;z-index:1}
+.hero-masthead{font-family:'Playfair Display',serif;font-size:clamp(11px,1.2vw,13px);letter-spacing:.5em;color:var(--gold);margin-bottom:28px;opacity:.9;text-transform:uppercase}
+.hero-crossword{display:grid;grid-template-columns:repeat(7,44px);grid-template-rows:repeat(3,44px);gap:3px;margin:0 auto 36px;position:relative}
+.cell{width:44px;height:44px;background:rgba(240,192,64,.06);border:1px solid rgba(240,192,64,.2);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--gold);position:relative;transition:background .3s}
+.cell.black{background:rgba(240,192,64,.15);border-color:rgba(240,192,64,.3)}
+.cell.lit{background:rgba(240,192,64,.12);animation:cell-glow 2s ease-in-out infinite}
+.cell-num{position:absolute;top:2px;left:3px;font-size:8px;font-family:'Share Tech Mono',monospace;color:rgba(240,192,64,.6);line-height:1}
+@keyframes cell-glow{0%,100%{background:rgba(240,192,64,.06)}50%{background:rgba(240,192,64,.18)}}
+.hero-title{font-family:'Playfair Display',serif;font-size:clamp(28px,5.5vw,62px);font-weight:900;letter-spacing:.02em;color:#fff;line-height:1.1;margin-bottom:12px;text-shadow:0 0 60px rgba(240,192,64,.2)}
+.hero-title em{color:var(--gold);font-style:normal}
+.hero-sub-title{font-family:'Share Tech Mono',monospace;font-size:clamp(10px,1.3vw,13px);letter-spacing:.2em;color:var(--text);margin-bottom:36px;line-height:1.8}
+.hero-papers{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:36px}
+.paper-badge{font-family:'Playfair Display',serif;font-size:13px;font-weight:700;padding:10px 22px;border-radius:4px;letter-spacing:.04em}
+.paper-badge.times{background:rgba(200,40,40,.15);border:1px solid rgba(200,40,40,.4);color:#ff6b6b}
+.paper-badge.sunday{background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.35);color:var(--gold)}
+.paper-badge.sun{background:rgba(255,120,0,.12);border:1px solid rgba(255,120,0,.35);color:#ff9540}
+.hero-desc{font-size:clamp(16px,2vw,19px);color:var(--text);line-height:1.85;max-width:680px;margin:0 auto 48px}
+.hero-desc strong{color:#fff}
+.hero-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn-gold{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:.12em;background:var(--gold);color:#06080f;border-radius:4px;padding:14px 36px;text-decoration:none;font-weight:700;transition:background .2s,transform .2s,box-shadow .2s;box-shadow:0 0 20px rgba(240,192,64,.3)}
+.btn-gold:hover{background:var(--gold2);transform:translateY(-2px);box-shadow:0 0 40px rgba(240,192,64,.5)}
+.btn-outline{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:.12em;background:transparent;color:var(--text);border:1px solid rgba(240,192,64,.25);border-radius:4px;padding:14px 36px;text-decoration:none;transition:all .2s}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+
+/* ── SECTIONS ── */
+.section{padding:80px 40px;position:relative;z-index:1}
+.section-inner{max-width:1100px;margin:0 auto}
+.section-kicker{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.28em;color:var(--gold);margin-bottom:14px;text-align:center}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(22px,4vw,38px);font-weight:900;color:#fff;text-align:center;margin-bottom:16px;line-height:1.2}
+.section-line{display:block;width:60px;height:2px;background:linear-gradient(90deg,var(--gold),transparent);margin:0 auto 24px}
+.section-sub{font-size:17px;color:var(--text);text-align:center;max-width:680px;margin:0 auto 52px;line-height:1.8}
+
+/* ── SCREENSHOT ── */
+.screenshot-frame{border:2px solid rgba(240,192,64,.2);border-radius:12px;overflow:hidden;max-width:800px;margin:0 auto 48px;box-shadow:0 8px 60px rgba(240,192,64,.1)}
+.screenshot-frame img{width:100%;display:block}
+
+/* ── FEATURES ── */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;max-width:1100px;margin:0 auto}
+.feat-card{background:var(--bg-card);border:1px solid rgba(240,192,64,.1);border-radius:12px;padding:28px 24px;transition:border-color .3s,transform .3s}
+.feat-card:hover{border-color:rgba(240,192,64,.3);transform:translateY(-4px)}
+.feat-icon{font-size:34px;margin-bottom:12px}
+.feat-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--gold);margin-bottom:10px}
+.feat-body{font-size:15px;color:var(--text);line-height:1.7}
+
+/* ── STORY BAND ── */
+.story-band{background:linear-gradient(135deg,rgba(240,192,64,.05),rgba(0,200,255,.03));border:1px solid rgba(240,192,64,.18);border-radius:20px;padding:52px 48px;max-width:960px;margin:0 auto}
+.story-quote{font-family:'Playfair Display',serif;font-size:clamp(16px,2.5vw,22px);font-weight:700;color:#fff;line-height:1.5;margin-bottom:28px;font-style:italic}
+.story-quote em{color:var(--gold);font-style:normal}
+.story-body{font-size:16px;color:var(--text);line-height:1.85;margin-bottom:16px}
+.story-body strong{color:#fff}
+.story-sig{margin-top:28px;padding-top:24px;border-top:1px solid rgba(240,192,64,.15)}
+.story-name{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:#fff;margin-bottom:4px}
+.story-role{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.12em;color:var(--gold)}
+
+/* ── PUBLICATIONS ── */
+.pubs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:900px;margin:0 auto}
+.pub-card{background:var(--bg-card);border-radius:16px;padding:36px 28px;text-align:center;transition:transform .3s,border-color .3s}
+.pub-card.times{border:1px solid rgba(200,40,40,.25)}
+.pub-card.times:hover{border-color:rgba(200,40,40,.5);transform:translateY(-4px)}
+.pub-card.sunday{border:1px solid rgba(240,192,64,.25)}
+.pub-card.sunday:hover{border-color:rgba(240,192,64,.5);transform:translateY(-4px)}
+.pub-card.sun{border:1px solid rgba(255,120,0,.25)}
+.pub-card.sun:hover{border-color:rgba(255,120,0,.5);transform:translateY(-4px)}
+.pub-icon{font-size:48px;margin-bottom:16px}
+.pub-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:900;margin-bottom:10px}
+.pub-name.times{color:#ff6b6b}
+.pub-name.sunday{color:var(--gold)}
+.pub-name.sun{color:#ff9540}
+.pub-body{font-size:15px;color:var(--text);line-height:1.7}
+
+/* ── SPECS ── */
+.specs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;max-width:900px;margin:0 auto}
+.spec-card{background:var(--bg-card);border:1px solid rgba(240,192,64,.1);border-radius:10px;padding:20px 16px;text-align:center}
+.spec-icon{font-size:28px;margin-bottom:8px}
+.spec-title{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.15em;color:var(--gold);margin-bottom:6px}
+.spec-val{font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;color:#fff;line-height:1.3}
+
+/* ── CLUE BAND ── */
+.clue-band{background:var(--bg-card);border:1px solid rgba(240,192,64,.15);border-radius:16px;padding:40px 44px;max-width:860px;margin:0 auto}
+.clue-number{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--gold);margin-bottom:8px}
+.clue-text{font-family:'Playfair Display',serif;font-size:clamp(17px,2.5vw,24px);font-weight:700;color:#fff;line-height:1.4;margin-bottom:20px;font-style:italic}
+.clue-answer{font-family:'Share Tech Mono',monospace;font-size:20px;letter-spacing:.3em;color:var(--gold);margin-bottom:8px}
+.clue-note{font-size:14px;color:var(--text)}
+
+/* ── CONNECT AVATAR ── */
+.av-connect-btn{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.12em;color:#06080f;background:var(--gold);border:none;border-radius:999px;padding:9px 18px;cursor:pointer;white-space:nowrap;transition:background .2s}
+.av-connect-btn:hover{background:var(--gold2)}
+.av-connected-badge{display:none;align-items:center;gap:8px;background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.25);border-radius:999px;padding:6px 14px}
+.av-connected-badge.show{display:flex}
+.av-avatar-name{font-family:'Share Tech Mono',monospace;font-size:11px;color:#fff;letter-spacing:.08em}
+.av-karma-pill{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--gold);cursor:pointer}
+.av-logout-btn{background:none;border:none;color:rgba(200,191,168,.5);cursor:pointer;font-size:12px;padding:0 2px}
+.av-logout-btn:hover{color:#fff}
+.av-modal-overlay{display:none;position:fixed;inset:0;background:rgba(6,8,15,.9);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center}
+.av-modal-overlay.open{display:flex}
+.av-modal{background:#0b0f1c;border:1px solid rgba(240,192,64,.2);border-radius:16px;padding:40px;width:100%;max-width:400px;text-align:center;position:relative}
+.av-modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:rgba(200,191,168,.5);font-size:18px;cursor:pointer}
+.av-modal-close:hover{color:#fff}
+.av-modal-kicker{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.2em;color:var(--gold);margin-bottom:10px}
+.av-modal-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:#fff;margin-bottom:8px}
+.av-modal-sub{font-size:14px;color:var(--text);margin-bottom:24px;line-height:1.6}
+.av-field{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(240,192,64,.2);border-radius:8px;padding:12px 16px;color:#fff;font-family:'Rajdhani',sans-serif;font-size:15px;margin-bottom:12px;outline:none;transition:border-color .2s}
+.av-field:focus{border-color:rgba(240,192,64,.5)}
+.av-field::placeholder{color:rgba(200,191,168,.4)}
+.av-submit{width:100%;background:var(--gold);color:#06080f;border:none;border-radius:4px;padding:13px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:.12em;cursor:pointer;margin-top:4px;transition:background .2s}
+.av-submit:hover{background:var(--gold2)}
+.av-error{font-size:13px;color:#ff5f5f;margin-top:8px;min-height:20px}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid rgba(240,192,64,.1);padding:48px 40px;text-align:center;position:relative;z-index:1}
+.footer-brand{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;color:#fff;margin-bottom:6px}
+.footer-brand span{color:var(--gold)}
+.footer-sub{font-size:14px;color:var(--text);margin-bottom:24px}
+.footer-links{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;list-style:none;margin-bottom:32px}
+.footer-links a{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--text);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--gold)}
+.footer-copy{font-size:13px;color:rgba(200,191,168,.4)}
+
+@media(max-width:820px){
+  .pubs-grid{grid-template-columns:1fr}
+  .section{padding:60px 20px}
+  .story-band{padding:36px 24px}
+  .clue-band{padding:28px 24px}
+}
+@media(max-width:520px){.section{padding:60px .75rem}}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<nav>
+  <a class="nav-brand" href="#"><span>NextGen</span> Crosswords</a>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="#publications">Publications</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#screenshot">Screenshots</a></li>
+    <li><a href="#story">The Story</a></li>
+    <li><a href="#oasis">OASIS</a></li>
+    <li class="nav-links-mobile-only"><a href="https://oasisomniverse.one" target="_blank" rel="noopener">OASIS Omniverse</a></li>
+  </ul>
+  <div class="nav-right">
+    <a class="nav-cta" href="http://www.akenheadcrosswordsolutions.com" target="_blank" rel="noopener">✏️ Get the App</a>
+  </div>
+  <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-masthead">NextGen Software · Crossword Solutions · Since 2010</div>
+
+  <!-- Mini animated crossword grid -->
+  <div class="hero-crossword" id="hero-grid">
+    <div class="cell black"></div>
+    <div class="cell lit"><span class="cell-num">1</span>N</div>
+    <div class="cell lit">E</div>
+    <div class="cell lit">X</div>
+    <div class="cell lit">T</div>
+    <div class="cell lit">G</div>
+    <div class="cell black"></div>
+    <div class="cell lit"><span class="cell-num">2</span>T</div>
+    <div class="cell black"></div>
+    <div class="cell lit"><span class="cell-num">3</span>C</div>
+    <div class="cell black"></div>
+    <div class="cell lit">E</div>
+    <div class="cell black"></div>
+    <div class="cell lit">X</div>
+    <div class="cell lit">I</div>
+    <div class="cell black"></div>
+    <div class="cell lit">R</div>
+    <div class="cell black"></div>
+    <div class="cell lit">A</div>
+    <div class="cell black"></div>
+    <div class="cell lit">D</div>
+  </div>
+
+  <h1 class="hero-title"><em>NextGen</em> Crosswords</h1>
+  <div class="hero-sub-title">OFFICIAL CROSSWORD SOFTWARE FOR THE UK'S BIGGEST NEWSPAPERS</div>
+
+  <div class="hero-papers">
+    <span class="paper-badge times">The Times</span>
+    <span class="paper-badge sunday">The Sunday Times</span>
+    <span class="paper-badge sun">The Sun</span>
+  </div>
+
+  <p class="hero-desc">Built by David Ellams of NextGen Software in partnership with <strong>Times crossword setter David Akenhead</strong> — the official desktop app for his crossword archive, solutions, hints and more. Loved by crossword enthusiasts across the UK.</p>
+  <div class="hero-btns">
+    <a class="btn-gold" href="http://www.akenheadcrosswordsolutions.com" target="_blank" rel="noopener">Get the App →</a>
+    <a class="btn-outline" href="#story">Read the Story</a>
+  </div>
+</section>
+
+<!-- PUBLICATIONS -->
+<section class="section" id="publications" style="background:rgba(240,192,64,.02)">
+  <div class="section-inner">
+    <div class="section-kicker">THE PUBLICATIONS</div>
+    <h2 class="section-title">Three of Britain's Biggest Papers.</h2>
+    <span class="section-line"></span>
+    <p class="section-sub">David Akenhead is one of the UK's most celebrated crossword setters — his puzzles appear in three of the country's most-read newspapers. NextGen Crosswords brings his entire archive to your desktop.</p>
+
+    <div class="pubs-grid">
+      <div class="pub-card times">
+        <div class="pub-icon">🗞️</div>
+        <div class="pub-name times">The Times</div>
+        <p class="pub-body">One of the world's most iconic newspapers — home to one of Britain's most revered crossword traditions. The Times crossword has been a national institution for over 80 years.</p>
+      </div>
+      <div class="pub-card sunday">
+        <div class="pub-icon">📰</div>
+        <div class="pub-name sunday">The Sunday Times</div>
+        <p class="pub-body">The Sunday companion — for those who like their weekend to include something that genuinely challenges the mind alongside their morning coffee and toast.</p>
+      </div>
+      <div class="pub-card sun">
+        <div class="pub-icon">☀️</div>
+        <div class="pub-name sun">The Sun</div>
+        <p class="pub-body">Britain's biggest-selling newspaper brings its crossword to the app — making Akenhead's puzzles accessible to millions more solvers across the country.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENSHOT -->
+<section class="section" id="screenshot">
+  <div class="section-inner">
+    <div class="section-kicker">THE APPLICATION</div>
+    <h2 class="section-title">Elegant. Intuitive. Powerful.</h2>
+    <span class="section-line"></span>
+    <p class="section-sub">Built in WPF (Windows Presentation Foundation) — a polished, professional desktop application that feels right at home alongside the newspapers it complements.</p>
+
+    <div class="screenshot-frame">
+      <img src="https://static.wixstatic.com/media/4280d8_9c7ab884d24f407aa5ecb0146feab20f~mv2.jpg"
+           alt="Akenhead Crossword Solutions application screenshot" loading="lazy">
+    </div>
+
+    <div class="specs-grid">
+      <div class="spec-card"><div class="spec-icon">🖥️</div><div class="spec-title">PLATFORM</div><div class="spec-val">Windows Desktop</div></div>
+      <div class="spec-card"><div class="spec-icon">⚙️</div><div class="spec-title">TECHNOLOGY</div><div class="spec-val">WPF / .NET</div></div>
+      <div class="spec-card"><div class="spec-icon">📚</div><div class="spec-title">ARCHIVE</div><div class="spec-val">Full Back Catalogue</div></div>
+      <div class="spec-card"><div class="spec-icon">🗞️</div><div class="spec-title">PUBLICATIONS</div><div class="spec-val">3 Major Papers</div></div>
+      <div class="spec-card"><div class="spec-icon">👤</div><div class="spec-title">BUILT BY</div><div class="spec-val">1 Developer</div></div>
+      <div class="spec-card"><div class="spec-icon">🤝</div><div class="spec-title">IN PARTNERSHIP WITH</div><div class="spec-val">David Akenhead</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" id="features" style="background:rgba(240,192,64,.02)">
+  <div class="section-inner">
+    <div class="section-kicker">FEATURES</div>
+    <h2 class="section-title">Everything the Crossword Enthusiast Needs.</h2>
+    <span class="section-line"></span>
+
+    <div class="features-grid">
+      <div class="feat-card">
+        <div class="feat-icon">📖</div>
+        <div class="feat-title">Full Archive Access</div>
+        <p class="feat-body">Browse and solve the complete archive of David Akenhead's crosswords from The Times, The Sunday Times and The Sun — going back as far as the archive runs. Years of puzzles, all in one place.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💡</div>
+        <div class="feat-title">Solutions & Hints</div>
+        <p class="feat-body">Stuck on a clue? Check the official solution — or reveal just a single letter if you want a nudge without giving the game away. Hints at your own pace, your own style.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">✏️</div>
+        <div class="feat-title">Interactive Grid</div>
+        <p class="feat-body">Click, type and fill in the grid directly on screen — a proper interactive crossword experience rather than just a static solution viewer. Navigate by clue, by cell, by direction.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔍</div>
+        <div class="feat-title">Clue Search</div>
+        <p class="feat-body">Search across the entire archive by clue text, answer pattern or keyword. Find that clue you half-remember from three years ago. Research recurring themes and setter patterns.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📅</div>
+        <div class="feat-title">Date Navigation</div>
+        <p class="feat-body">Jump to any crossword by date — browse by day, month or year. Revisit a puzzle from a special occasion or work through a particular era chronologically.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🏆</div>
+        <div class="feat-title">Progress Tracking</div>
+        <p class="feat-body">Track how many crosswords you've completed, your average solving time, your personal bests and your archive completion percentage. Because every crossword enthusiast secretly loves a stat.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🖨️</div>
+        <div class="feat-title">Print Ready</div>
+        <p class="feat-body">Print any crossword beautifully formatted — for those who still prefer pencil on paper (a completely valid and noble choice). Perfect layout every time.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🌙</div>
+        <div class="feat-title">Clean Dark UI</div>
+        <p class="feat-body">A beautifully designed WPF interface that's easy on the eyes — whether you're solving at breakfast or during a late-night session after everyone's gone to bed.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔄</div>
+        <div class="feat-title">Regular Updates</div>
+        <p class="feat-body">New crosswords added as David Akenhead publishes them — keeping the archive current and giving you a fresh puzzle to look forward to every day.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- A CLUE -->
+<section class="section" id="story">
+  <div class="section-inner">
+    <div class="section-kicker">A CLUE</div>
+    <h2 class="section-title">How Did a Game Developer Build a Crossword App?</h2>
+    <span class="section-line"></span>
+
+    <div class="clue-band" style="margin-bottom:40px">
+      <div class="clue-number">1 ACROSS (6 letters)</div>
+      <div class="clue-text">"Versatile developer who taught himself C++, DirectX, websites and WPF — built games, crossword apps and eventually an entire technology universe (6)"</div>
+      <div class="clue-answer">D A V I D</div>
+      <div class="clue-note">✓ Confirmed. That was the easy one.</div>
+    </div>
+
+    <div class="story-band">
+      <div class="story-quote">"I've always loved a challenge outside my comfort zone. The web when no one knew what it was. C++ in my final year. And then WPF — a completely different paradigm — to build something genuinely useful for people who love language as much as I love code."</div>
+      <p class="story-body">NextGen Crosswords was built by David Ellams — the same developer who taught himself HTML in 1999, C++ and DirectX in 2001, and who went on to design the entire OASIS architecture. The crossword app was built in <strong>WPF (Windows Presentation Foundation)</strong> — a powerful but demanding .NET UI framework that David taught himself for the project.</p>
+      <p class="story-body">The app was created <strong>in collaboration with Times crossword setter David Akenhead</strong> — a professional partnership that produced a polished, commercial-grade desktop application for thousands of crossword fans across the UK. Three newspapers. A full archive. A beautiful interface. All built by one developer.</p>
+      <p class="story-body">It's a long way from Snake 3000 in VB6 — but the spirit is identical. Give David Ellams a new technology and a problem worth solving, and he will teach himself whatever it takes to solve it beautifully.</p>
+      <div class="story-sig">
+        <div class="story-name">David Ellams</div>
+        <div class="story-role">DEVELOPER — NEXTGEN CROSSWORDS · CEO/CTO/FOUNDER — NEXTGEN WORLD LTD · CREATOR OF THE OASIS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OASIS -->
+<section class="section" id="oasis" style="background:rgba(240,192,64,.02)">
+  <div class="section-inner">
+    <div class="section-kicker">PART OF THE BIGGER PICTURE</div>
+    <h2 class="section-title">One Developer. Twenty-Five Years. One Universe.</h2>
+    <span class="section-line"></span>
+    <p class="section-sub">Akenhead Crossword Solutions is one chapter in a remarkable story — a developer who has spent 25 years teaching himself whatever technology was needed, building whatever needed building, and never once settling for "good enough".</p>
+
+    <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-bottom:40px">
+      <span style="background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);border-radius:8px;padding:10px 18px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold)">🐍 Snake 3000 — 1999</span>
+      <span style="background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);border-radius:8px;padding:10px 18px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold)">🕹️ Shadow Fighter — 2001</span>
+      <span style="background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);border-radius:8px;padding:10px 18px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold)">✏️ NextGen Crosswords — 2010s</span>
+      <span style="background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);border-radius:8px;padding:10px 18px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold)">🧘 Yoga4Autism — 2013</span>
+      <span style="background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);border-radius:8px;padding:10px 18px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold)">🌍 Our World — 2016</span>
+      <span style="background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);border-radius:8px;padding:10px 18px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.1em;color:var(--gold)">🌌 OASIS — 2019</span>
+    </div>
+
+    <div style="text-align:center">
+      <a class="btn-gold" href="https://oasisomniverse.one" target="_blank" rel="noopener">Explore the OASIS Omniverse →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand"><span>NextGen</span> Crosswords</div>
+  <p class="footer-sub">Built by David Ellams · NextGen Software · In partnership with David Akenhead · The Times · The Sunday Times · The Sun</p>
+  <ul class="footer-links">
+    <li><a href="#publications">Publications</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="#story">The Story</a></li>
+    <li><a href="http://www.akenheadcrosswordsolutions.com" target="_blank" rel="noopener">Official Site</a></li>
+    <li><a href="https://shadowfighter.oasisomniverse.one" target="_blank" rel="noopener">Shadow Fighter</a></li>
+    <li><a href="https://oasisomniverse.one" target="_blank" rel="noopener">OASIS Omniverse</a></li>
+  </ul>
+  <p class="footer-copy">© David Ellams & NextGen Software. All rights reserved.</p>
+</footer>
+
+<!-- CONNECT AVATAR MODAL -->
+<div class="av-modal-overlay" id="av-modal-overlay">
+  <div class="av-modal">
+    <button class="av-modal-close" id="av-modal-close">✕</button>
+    <div class="av-modal-kicker">OASIS WEB4 API</div>
+    <div class="av-modal-title">Connect Your Avatar</div>
+    <p class="av-modal-sub">Sign in with your OASIS avatar to connect your crossword progress to the wider OASIS ecosystem.</p>
+    <input class="av-field" id="bi-email" type="email" placeholder="Email address" autocomplete="username">
+    <input class="av-field" id="bi-password" type="password" placeholder="Password" autocomplete="current-password">
+    <button class="av-submit" id="av-submit">CONNECT AVATAR</button>
+    <div class="av-error" id="av-error"></div>
+  </div>
+</div>
+
+<script>
+document.getElementById('nav-toggle').addEventListener('click',function(){
+  this.classList.toggle('open');
+  document.getElementById('nav-links').classList.toggle('open');
+});
+
+// Gold particle stars
+(function(){
+  const canvas=document.createElement('canvas');
+  canvas.style.cssText='position:fixed;inset:0;z-index:0;pointer-events:none';
+  document.body.prepend(canvas);
+  const ctx=canvas.getContext('2d');
+  let stars=[];
+  function resize(){
+    canvas.width=innerWidth;canvas.height=innerHeight;
+    stars=Array.from({length:100},()=>({
+      x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+      r:Math.random()*.7+.2,o:Math.random()*.3+.05,
+      s:Math.random()*.12+.03,
+      c:Math.random()>.85?'rgba(240,192,64,':'rgba(200,191,168,'
+    }));
+  }
+  resize();window.addEventListener('resize',resize);
+  (function draw(){
+    requestAnimationFrame(draw);ctx.clearRect(0,0,canvas.width,canvas.height);
+    stars.forEach(s=>{
+      s.o+=s.s*.008*(Math.random()>.5?1:-1);
+      s.o=Math.max(.03,Math.min(.45,s.o));
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=s.c+s.o+')';ctx.fill();
+    });
+  })();
+})();
+
+// Animate crossword cells
+(function(){
+  const cells=document.querySelectorAll('.cell:not(.black)');
+  let i=0;
+  setInterval(()=>{
+    cells.forEach(c=>c.classList.remove('lit'));
+    cells[i%cells.length].classList.add('lit');
+    i++;
+  },600);
+})();
+
+// Connect Avatar
+(function(){
+  const navCta=document.querySelector('.nav-cta');
+  if(!navCta)return;
+  const connectBtn=document.createElement('button');
+  connectBtn.className='av-connect-btn';connectBtn.id='av-connect-btn';
+  connectBtn.textContent='⬡ CONNECT AVATAR';
+  navCta.closest('.nav-right').appendChild(connectBtn);
+  const badge=document.createElement('div');
+  badge.className='av-connected-badge';badge.id='av-badge';
+  badge.innerHTML=`<span class="av-avatar-name" id="av-avatar-name">—</span><span class="av-karma-pill" id="av-karma-pill">✏️ 0</span><button class="av-logout-btn" id="av-logout-btn">✕</button>`;
+  navCta.closest('.nav-right').appendChild(badge);
+  document.getElementById('av-logout-btn').addEventListener('click',logout);
+  const overlay=document.getElementById('av-modal-overlay');
+  document.getElementById('av-modal-close').addEventListener('click',()=>overlay.classList.remove('open'));
+  overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('open')});
+  connectBtn.addEventListener('click',()=>overlay.classList.add('open'));
+  document.getElementById('av-submit').addEventListener('click',async()=>{
+    const email=document.getElementById('bi-email').value.trim();
+    const password=document.getElementById('bi-password').value;
+    const err=document.getElementById('av-error');err.textContent='';
+    if(!email||!password){err.textContent='Please enter your email and password.';return;}
+    try{
+      const{OASISClient}=await import('https://esm.sh/@oasisomniverse/web4-api@2.0.2');
+      const client=new OASISClient({baseUrl:'https://api.web4.oasisomniverse.one',persistSession:true});
+      const res=await client.avatar.login({username:email,password});
+      if(res?.isError){err.textContent=res.message||'Login failed.';return;}
+      const av=res?.result?.avatar||res?.result;
+      if(av){
+        document.getElementById('av-avatar-name').textContent=av.username||av.email||'Avatar';
+        document.getElementById('av-karma-pill').textContent='✏️ '+(av.karmaTotal??0);
+        connectBtn.style.display='none';badge.classList.add('show');
+        overlay.classList.remove('open');
+      }
+    }catch(e){err.textContent='Connection error. Please try again.';}
+  });
+  function logout(){
+    connectBtn.style.display='';badge.classList.remove('show');
+    document.getElementById('av-avatar-name').textContent='—';
+    document.getElementById('av-karma-pill').textContent='✏️ 0';
+  }
+})();
+</script>
+</body>
+</html>
